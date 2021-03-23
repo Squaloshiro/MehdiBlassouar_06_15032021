@@ -7,7 +7,7 @@ const multer = require('../middleware/multer-config')
 
 router.post('/', auth, multer, stuffCtrl.createThing)
 
-
+router.post('/:id/like', auth, stuffCtrl.like)
 
 router.put('/:id', auth, multer, stuffCtrl.modifyThing);
 
