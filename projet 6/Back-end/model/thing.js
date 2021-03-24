@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const sanitizerPlugin = require('mongoose-sanitizer-plugin')
+
 
 const thingSchema = mongoose.Schema({
 
@@ -17,6 +19,10 @@ const thingSchema = mongoose.Schema({
 
 });
 
+// purifie les champs du model avant de les enregistrer dans la base MongoDB.
+// Utilise le HTML Sanitizer de Google Caja pour effectuer la désinfection.
+
+thingSchema.plugin(sanitizerPlugin)
 
 
 module.exports = mongoose.model('thing', thingSchema);
