@@ -21,14 +21,22 @@ exports.createThing = (req, res, next) => {
 };
 
 exports.modifyThing = (req, res, next) => {
+    Thing.findOne({
+        _id: req.params.id
+    }).then((sauce) => {
+        const filename = sauce.imageUrl.split('/images/')[1]
+        fs.unlinkSync(`images/${filename}`)
+    })
+
     const thingObject = req.file ?
         {
-            ...JSON.parse(req.body.thing),
+            ...JSON.parse(req.body.sauce),
             imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
         } : { ...req.body };
+
     Thing.updateOne({ _id: req.params.id }, { ...thingObject, _id: req.params.id })
         .then(() => res.status(200).json({ message: 'Objet modifié !' }))
-        .catch(error => res.status(400).json({ error }));
+        .catch(error => res.status(400).json({ error: 'cette sauce éxiste pas' }));
 };
 
 exports.deleteThing = (req, res, next) => {
@@ -41,13 +49,13 @@ exports.deleteThing = (req, res, next) => {
                     .catch(error => res.status(400).json({ error }));
             });
         })
-        .catch(error => res.status(500).json({ error }));
+        .catch(error => res.status(500).json({ error: 'cette sauce éxiste pas' }));
 };
 
 exports.getOneThing = (req, res, next) => {
     Thing.findOne({ _id: req.params.id })
         .then(thing => res.status(200).json(thing))
-        .catch(error => res.status(404).json({ error }));
+        .catch(error => res.status(404).json({ error: 'cette sauce éxiste pas' }));
 }
 
 exports.getAllThing = (req, res, next) => {
@@ -64,107 +72,111 @@ exports.like = async (req, res, next) => {
 
     let { like, userId } = req.body
     let sauceId = req.params.id
-    try {
-        if (like === 1) {
-            try {
-                await Thing.updateOne({
-                    _id: sauceId
-                }, {
-                    $push: {
-                        usersLiked: userId
-                    },
-                    $inc: {
-                        likes: +1
-                    },
-                })
-                res.status(200).json({
-                    message: 'j aime ajouté !'
-                })
-            } catch (error) {
-                res.status(400).json({
-                    error
-                })
-            }
-        }
-        if (like === -1) {
-            try {
-                await Thing.updateOne({
-                    _id: sauceId
-                }, {
-                    $push: {
-                        usersDisliked: userId
-                    },
-                    $inc: {
-                        dislikes: +1
-                    },
-                })
-                res.status(200).json({
-                    message: 'Dislike ajouté !'
-                })
-            }
-            catch (error) {
-                res.status(400).json({
-                    error
-                })
-            }
-        }
-        if (like === 0) {
-            try {
-                const thing = await Thing.findOne({
-                    _id: sauceId
-                })
-                if (thing.usersLiked.includes(userId)) {
-                    try {
-                        await Thing.updateOne({
-                            _id: sauceId
-                        }, {
-                            $pull: {
-                                usersLiked: userId
-                            },
-                            $inc: {
-                                likes: -1
-                            },
-                        })
-                        res.status(200).json({
-                            message: 'Like retiré !'
-                        })
-                    } catch (error) {
-                        res.status(400).json({
-                            error
-                        })
-                    }
-                }
-                if (thing.usersDisliked.includes(userId)) {
-                    try {
-                        await Thing.updateOne({
-                            _id: sauceId
-                        }, {
-                            $pull: {
-                                usersDisliked: userId
-                            },
-                            $inc: {
-                                dislikes: -1
-                            },
-                        })
-                        res.status(200).json({
-                            message: 'Dislike retiré !'
-                        })
-                    } catch (error) {
-                        res.status(400).json({
-                            error
-                        })
-                    }
-                }
-            } catch (error) {
-                res.status(400).json({
-                    error
-                })
-            }
+
+
+    if (!userId || !sauceId) {
+        res.status(400).json({ message: 'donné incomplete' })
+        return
+    }
+
+    if (like === 1) {
+        try {
+            await Thing.updateOne({
+                _id: sauceId
+            }, {
+                $push: {
+                    usersLiked: userId
+                },
+                $inc: {
+                    likes: +1
+                },
+            })
+            res.status(200).json({
+                message: 'j aime ajouté !'
+            })
+        } catch (error) {
+            res.status(400).json({
+                error: 'cette sauce éxiste pas'
+            })
         }
     }
-    catch (error) {
-        res.status(404).json({
-            error
+    else if (like === -1) {
+        try {
+            await Thing.updateOne({
+                _id: sauceId
+            }, {
+                $push: {
+                    usersDisliked: userId
+                },
+                $inc: {
+                    dislikes: +1
+                },
+            })
+            res.status(200).json({
+                message: 'Dislike ajouté !'
+            })
+        }
+        catch (error) {
+            res.status(400).json({
+                error: 'cette sauce éxiste pas'
+            })
+        }
+    }
+    else if (like === 0) {
+        try {
+            const thing = await Thing.findOne({
+                _id: sauceId
+            })
+            if (thing.usersLiked.includes(userId)) {
+                try {
+                    await Thing.updateOne({
+                        _id: sauceId
+                    }, {
+                        $pull: {
+                            usersLiked: userId
+                        },
+                        $inc: {
+                            likes: -1
+                        },
+                    })
+                    res.status(200).json({
+                        message: 'Like retiré !'
+                    })
+                } catch (error) {
+                    res.status(400).json({
+                        error: 'cette sauce éxiste pas'
+                    })
+                }
+            }
+            if (thing.usersDisliked.includes(userId)) {
+                try {
+                    await Thing.updateOne({
+                        _id: sauceId
+                    }, {
+                        $pull: {
+                            usersDisliked: userId
+                        },
+                        $inc: {
+                            dislikes: -1
+                        },
+                    })
+                    res.status(200).json({
+                        message: 'Dislike retiré !'
+                    })
+                } catch (error) {
+                    res.status(400).json({
+                        error
+                    })
+                }
+            }
+        } catch (error) {
+            res.status(400).json({
+                error: 'cette sauce éxiste pas'
+            })
+        }
+    } else {
+        res.status(400).json({
+            error: 'cette sauce éxiste pas'
         })
     }
 }
