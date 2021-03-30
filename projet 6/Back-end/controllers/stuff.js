@@ -21,18 +21,19 @@ exports.createThing = (req, res, next) => {
 };
 
 exports.modifyThing = (req, res, next) => {
-    Thing.findOne({
-        _id: req.params.id
-    }).then((sauce) => {
-        const filename = sauce.imageUrl.split('/images/')[1]
-        fs.unlinkSync(`images/${filename}`)
-    })
 
-    const thingObject = req.file ?
+
+    const thingObject = req.file ? (
+        Thing.findOne({
+            _id: req.params.id
+        }).then((sauce) => {
+            const filename = sauce.imageUrl.split('/images/')[1]
+            fs.unlinkSync(`images/${filename}`)
+        }),
         {
             ...JSON.parse(req.body.sauce),
-            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-        } : { ...req.body };
+            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+        }) : { ...req.body };
 
     Thing.updateOne({ _id: req.params.id }, { ...thingObject, _id: req.params.id })
         .then(() => res.status(200).json({ message: 'Objet modifié !' }))
