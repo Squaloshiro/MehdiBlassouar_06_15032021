@@ -51,3 +51,16 @@ exports.pepperValidator = [ // Validation pour le principal ingrédient de la sa
         message: "Ne peut contenir que des caractères alphanumériques entre 3 et 20 caractères",
     }),
 ];
+
+exports.heatValidator = [ //  Validation pour la decription de la sauce
+    validate({
+        validator: 'isLength',
+        arguments: [1, 10],
+        message: 'La description de la sauce doit contenir entre 10 et 150 caractères',
+    }),
+    validate({
+        validator: 'matches',
+        arguments: /^[1-10]+$/i, // Regex pour restreindre le type de symboles pour la description de la sauce
+        message: "Vous ne pouvez utiliser que des chiffres et des lettres pour la description de la sauce",
+    }),
+];
