@@ -29,19 +29,11 @@ exports.modifyThing = async (req, res, next) => {
     const decodedToken = jwt.verify(token, process.env.TOKEN,);
     const userId = decodedToken.userId;
 
-    /*  
-      if(typeof req.body === "object"){
-      }
-      if (!req.body.sauce || typeof req.body.sauce !== "string") {
-          return res.status(400).json({ error: "test22212" })
-      }
-*/
-    //const { name, manufacturer, description, mainPepper } = JSON.parse(req.body.sauce)
-    /* if (!req.body.name || !req.body.manufacturer || !req.body.description || !req.body.mainPepper) {
-         return res.status(400).json({ error: "test" })
-     }*/
-    //if (req.body.likes === -1 || req.body.likes === 0 || req.body.likes === 1) {
-    ;
+    // if (!req.body.name || !req.body.manufacturer || !req.body.description || !req.body.mainPepper) {
+    //     return res.status(400).json({ error: "test" })
+    // }
+
+
     try {
         const checkSauce = await Thing.findOne({
             _id: req.params.id
@@ -68,28 +60,15 @@ exports.modifyThing = async (req, res, next) => {
                 Thing.updateOne({ _id: req.params.id }, { ...thingObject, _id: req.params.id }, opts)
                     .then(() => res.status(200).json({ message: 'Objet modifié !' }))
                     .catch(error => res.status(400).json({ error: "erreur la sauce n'a pas pu être modifié" }))
-
             } else {
                 res.status(400).json({ error: 'cette sauce ne vous appartient pas' })
             }
-
-
-        }
-
-        else {
+        } else {
             res.status(400).json({ error: 'cette sauce éxiste pas' })
         }
     } catch (error) {
         res.status(400).json({ error: 'une erreur est survenu' })
     }
-
-    // } else {
-
-    //     res.status(400).json({ error: '!!!!!' })
-    // }
-
-
-
 
 };
 
@@ -112,7 +91,6 @@ exports.deleteThing = async (req, res, next) => {
                                 .catch(error => res.status(400).json({ error }));
                         });
                     })
-                //.catch(error => res.status(500).json({ error: 'cette sauce ne vous appartient pas' }));
             } else {
                 res.status(400).json({ error: 'cette sauce ne vous appartient pas' })
             }
@@ -134,7 +112,6 @@ exports.getOneThing = (req, res, next) => {
 }
 
 exports.getAllThing = (req, res, next) => {
-
     Thing.find()
         .then(things => res.status(200).json(things))
         .catch(error => res.status(400).json({ error }))

@@ -1,6 +1,8 @@
 
 const validate = require('mongoose-validator'); // Appel du plugin mongoose-validator
 
+const alphaValidationRegex = /^[ A-Za-z0-9_@./'à#&+-]*$/i
+
 exports.nameValidator = [ // Validation du champ 'nom de la sauce'
     validate({
         validator: 'isLength',
@@ -9,7 +11,7 @@ exports.nameValidator = [ // Validation du champ 'nom de la sauce'
     }),
     validate({
         validator: 'matches',
-        arguments: /^[a-z\d\-_\s]+$/i, // Regex pour restreindre le type de symboles utilisables
+        arguments: alphaValidationRegex, // Regex pour restreindre le type de symboles utilisables
         message: "Vous ne pouvez utiliser que des chiffres et des lettres pour nommer votre sauce",
     }),
 ];
@@ -22,7 +24,7 @@ exports.manufacturerValidator = [ // Validation pour le manufacturer
     }),
     validate({
         validator: 'matches',
-        arguments: /^[a-z\d\-_\s]+$/i, // Regex pour restreindre le type de symboles pour le manufacturer
+        arguments: alphaValidationRegex, // Regex pour restreindre le type de symboles pour le manufacturer
         message: "Vous ne pouvez utiliser que des chiffres et des lettres pour nommer le fabricant",
     }),
 ];
@@ -35,7 +37,7 @@ exports.descriptionValidator = [ //  Validation pour la decription de la sauce
     }),
     validate({
         validator: 'matches',
-        arguments: /^[a-z\d\-_\s]+$/i, // Regex pour restreindre le type de symboles pour la description de la sauce
+        arguments: alphaValidationRegex, // Regex pour restreindre le type de symboles pour la description de la sauce
         message: "Vous ne pouvez utiliser que des chiffres et des lettres pour la description de la sauce",
     }),
 ];
@@ -56,7 +58,7 @@ exports.heatValidator = [ //  Validation pour la decription de la sauce
     validate({
         validator: 'isLength',
         arguments: [1, 10],
-        message: 'La description de la sauce doit contenir entre 10 et 150 caractères',
+        message: 'Cela ne peut être une note de 1 à 10',
     }),
     validate({
         validator: 'matches',
