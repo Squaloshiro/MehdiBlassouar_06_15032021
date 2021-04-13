@@ -20,4 +20,7 @@ router.get('/:id', auth, stuffCtrl.getOneThing);
 
 router.get('/', auth, stuffCtrl.getAllThing);
 
+//router.all('*', (req, res) => { res.json({ error: 404 }) })
+
+
 module.exports = router;

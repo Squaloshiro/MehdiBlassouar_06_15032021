@@ -63,5 +63,5 @@ app.use('/images', express.static(path.join(__dirname, 'images')));// charger le
 app.use('/api/sauces', stuffRoutes)//route sauces
 
 app.use('/api/auth', userRoutes);// route user
-
+app.use('*', (req, res) => { res.json({ error: 404 }) })
 module.exports = app;// exporte express pour le server.js

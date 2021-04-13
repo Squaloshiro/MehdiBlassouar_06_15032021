@@ -1,6 +1,13 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 const User = require('../model/user')
+var CryptoJS = require("crypto-js");
+
+/*var emailEncryt = CryptoJS.AES.encrypt(req.body.email, 'hdqsgf32153IGkhshffds6543GFKZL91804mozH').toString();
+var bytes = CryptoJS.AES.decrypt(emailEncryt, 'hdqsgf32153IGkhshffds6543GFKZL91804mozH');
+var originalText = bytes.toString(CryptoJS.enc.Utf8);*/
+
+//console.log(CryptoJS.HmacSHA1("Message", "Key"));
 //const validatorEmail = require('email-validator');
 
 /*function maskator(sentence) {
@@ -21,14 +28,28 @@ const User = require('../model/user')
     console.log(sentence + " is not a mail");
     return false
 }*/
+//var bytes = CryptoJS.SHA256.decrypt(ciphertext, 'secret key 123');
+
+//var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+
+
+
+
 
 exports.signup = (req, res, next) => {
+    console.log('-------------------req.bo-----------------');
+    console.log(req.body);
+    console.log('------------------------------------');
+
     bcrypt.hash(req.body.password, 10)
         .then(hash => {
+            var ciphertext = CryptoJS.SHA256.encrypt(JSON.stringify(userShema), 'secret key 123').toString();
+
             const user = new User({
-                email: /*maskator*/(req.body.email),
+                email: ciphertext,
                 password: hash
-            });
+            })
             user.save()
                 .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
                 .catch(error => res.status(400).json({ error }));
@@ -37,8 +58,10 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
+
     User.findOne({ email: req.body.email })
         .then(user => {
+
             if (!user) {
                 return res.status(401).json({ error: 'Vérifier les informations de saisie!' });
             }
