@@ -10,7 +10,7 @@ var store = new ExpressBrute.MemoryStore();
 var bruteforce = new ExpressBrute(store);
 
 
-router.post('/signup', verifMdp, verifEmail, userCtrl.signup);
+router.post('/signup', verifEmail, verifMdp, userCtrl.signup);
 router.post('/login', bruteforce.prevent, userCtrl.login);
 //router.all('*', (req, res) => { res.json({ error: 404 }) })
 
